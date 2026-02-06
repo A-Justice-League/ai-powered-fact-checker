@@ -60,27 +60,41 @@ class GeminiService:
     def _parse_gemini_response(self, response_data: Dict[str, Any]) -> Dict[str, Any]:
         """
         Parse Gemini REST response into structured JSON.
+        Ensures the result is always a dictionary.
         """
         try:
             # Extract text from the first candidate
             candidates = response_data.get("candidates", [])
             if not candidates:
-                raise ValueError(f"No candidates in Gemini response: {response_data}")
+                # Log the raw response for debugging if possible
+                raise ValueError(f"No candidates in Gemini response")
             
-            text = candidates[0].get("content", {}).get("parts", [{}])[0].get("text", "")
+            content = candidates[0].get("content", {})
+            parts = content.get("parts", [])
+            if not parts:
+                raise ValueError("Response content has no parts")
             
-            # Remove markdown code blocks if present
-            text = re.sub(r'```json\n?|\n?```', '', text).strip()
+            text = parts[0].get("text", "")
             
-            return json.loads(text)
-        except (json.JSONDecodeError, IndexError, KeyError) as e:
-            # Fallback: Extract JSON using regex if direct parsing fails
-            if "candidates" in response_data:
-                text = response_data["candidates"][0]["content"]["parts"][0]["text"]
-                json_match = re.search(r'\{.*\}', text, re.DOTALL)
-                if json_match:
-                    return json.loads(json_match.group())
+            # Remove markdown code blocks if present (Gemini often wraps JSON in ```json)
+            text = re.sub(r'```json\s?|\s?```', '', text).strip()
             
+            # Extract just the first JSON object/array if there's surrounding text
+            json_match = re.search(r'(\{.*\}|\[.*\])', text, re.DOTALL)
+            if json_match:
+                text = json_match.group()
+            
+            result = json.loads(text)
+            
+            # If the model returned a list of claims directly, wrap it in the expected dict structure
+            if isinstance(result, list):
+                return {
+                    "summaryVerdict": "Analysis complete.",
+                    "claims": result
+                }
+            
+            return result
+        except (json.JSONDecodeError, IndexError, KeyError, TypeError) as e:
             raise ValueError(f"Could not parse Gemini response: {str(e)}")
     
     def _process_claims(self, raw_claims: list) -> tuple[list[Claim], float]:
@@ -88,17 +102,24 @@ class GeminiService:
         Process raw claims into Claim objects with unique IDs.
         """
         claims = []
+        valid_raw_claims = []
+        
         for idx, c in enumerate(raw_claims):
+            # Skip if the claim entry is not a dictionary
+            if not isinstance(c, dict):
+                continue
+                
+            valid_raw_claims.append(c)
             claim_id = f"c{idx+1}-{str(uuid.uuid4())[:8]}"
             claims.append(Claim(
                 id=claim_id,
                 text=c.get("text", ""),
                 verdict=c.get("verdict", "UNSURE"),
                 explanation=c.get("explanation", ""),
-                sources=[Source(**s) for s in c.get("sources", [])]
+                sources=[Source(**s) for s in c.get("sources", []) if isinstance(s, dict)]
             ))
         
-        score = calculate_credibility_score(raw_claims)
+        score = calculate_credibility_score(valid_raw_claims)
         return claims, score
 
     async def _make_request(self, payload: Dict[str, Any]) -> Dict[str, Any]:
