@@ -17,8 +17,9 @@ The **AI-Powered Fact Checker** is a full-stack web application that leverages *
 
 - ✅ **Text Analysis**: Paste articles, social media posts, or any text for instant fact-checking
 - ✅ **Image Analysis**: Upload screenshots or images containing claims
-- ✅ **Gemini 3 Integration**: Powered by `gemini-2.0-flash` for fast, accurate analysis
+- ✅ **Gemini 3 Integration**: Powered by `gemini-3-flash-preview` for state-of-the-art analysis
 - ✅ **Google Search Grounding**: Real-time web verification with cited sources
+- ✅ **Search Query Transparency**: View the exact Google Search queries Gemini used
 - ✅ **Credibility Scoring**: Algorithmic truthfulness score (0-100%)
 - ✅ **Premium UI**: Modern, responsive design with smooth animations
 - ✅ **Structured Output**: JSON-formatted claims with verdicts and evidence
@@ -50,7 +51,7 @@ Misinformation is a global crisis affecting elections, public health, and social
                 │
                 ▼
 ┌─────────────────────────────────────┐
-│   Gemini 3 API (gemini-2.0-flash)   │
+│   Gemini 3 API (gemini-3-flash-preview)│
 │   + Google Search Grounding          │
 └─────────────────────────────────────┘
 ```
@@ -160,7 +161,7 @@ The app will open at `http://localhost:5173`
 
 ### Backend
 - **FastAPI** - High-performance Python web framework
-- **Gemini 3 API** - `gemini-2.0-flash` for claim extraction and verification
+- **Gemini 3 API** - `gemini-3-flash-preview` for claim extraction and verification
 - **Google Search Grounding** - Real-time web verification
 - **Pydantic** - Data validation and settings management
 - **Python 3.12+** - Modern Python with type hints
