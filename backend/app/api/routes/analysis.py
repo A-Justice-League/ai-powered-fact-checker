@@ -1,35 +1,27 @@
-"""
-Fact-checking analysis endpoints.
-"""
+import logging
 from fastapi import APIRouter, HTTPException, UploadFile, File
 
 from app.models.schemas import FactCheckRequest, FactCheckResponse
 from app.services.gemini import get_gemini_service
 
 router = APIRouter()
+logger = logging.getLogger(__name__)
 
 
 @router.post("/analyze-text", response_model=FactCheckResponse)
 async def analyze_text(request: FactCheckRequest):
     """
     Analyze text content for factual claims.
-    
-    Args:
-        request: FactCheckRequest with text field
-        
-    Returns:
-        FactCheckResponse with claims, verdicts, and credibility score
-        
-    Raises:
-        HTTPException: If analysis fails
     """
+    logger.info(f"Received text analysis request: {request.text[:50]}...")
     try:
         gemini_service = get_gemini_service()
         result = await gemini_service.analyze_text(request.text)
+        logger.info(f"Text analysis complete for request. Generated {len(result.get('claims', []))} claims.")
         return FactCheckResponse(**result)
     except Exception as e:
         error_msg = str(e)
-        print(f"Error analyzing text: {error_msg}")
+        logger.error(f"Error analyzing text: {error_msg}", exc_info=True)
         
         status_code = 500
         if "429" in error_msg or "RESOURCE_EXHAUSTED" in error_msg:
@@ -46,16 +38,8 @@ async def analyze_text(request: FactCheckRequest):
 async def analyze_image(file: UploadFile = File(...)):
     """
     Analyze image content for factual claims using multimodal AI.
-    
-    Args:
-        file: Uploaded image file
-        
-    Returns:
-        FactCheckResponse with claims extracted from image
-        
-    Raises:
-        HTTPException: If analysis fails
     """
+    logger.info(f"Received image analysis request: {file.filename}")
     try:
         # Read file content
         content = await file.read()
@@ -66,10 +50,11 @@ async def analyze_image(file: UploadFile = File(...)):
             filename=file.filename or "unknown",
             content_type=file.content_type or "image/jpeg"
         )
+        logger.info(f"Image analysis complete for {file.filename}. Generated {len(result.get('claims', []))} claims.")
         return FactCheckResponse(**result)
     except Exception as e:
         error_msg = str(e)
-        print(f"Error analyzing image: {error_msg}")
+        logger.error(f"Error analyzing image: {error_msg}", exc_info=True)
         
         status_code = 500
         if "429" in error_msg or "RESOURCE_EXHAUSTED" in error_msg:
