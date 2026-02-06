@@ -39,6 +39,11 @@ class GeminiService:
         # Use the standard Generative Language API endpoint
         self.base_url = "https://generativelanguage.googleapis.com/v1beta"
         
+        # Initialize in-memory cache
+        # Max 1000 items, expires in 24 hours
+        from cachetools import TTLCache
+        self._cache = TTLCache(maxsize=1000, ttl=86400)
+        
     def _get_fact_check_prompt(self) -> str:
         """
         Generate the fact-checking prompt for Gemini.
@@ -174,13 +179,7 @@ class GeminiService:
                         # 5xx Server Errors are transient
                         raise Exception(f"Gemini Server Error ({response.status_code}): {error_msg}")
                     else:
-                        # 4xx Client Errors (400, 401, 403) are likely permanent
-                        # We use ValueError to bypass the default retry logic if we were filtering,
-                        # but here we simply raise a clear message. 
-                        # To prevent retrying on permanent errors, one would typically use retry_if_exception_type,
-                        # but for simplicity in this hackathon context, a clear message is key.
-                        # However, to meet the "Transient failures" criteria strictly:
-                        # We will stick to raising Exception, but logging shows it's a client error.
+                        # 4xx Client Errors are permanent
                         raise Exception(f"Gemini Client Error ({response.status_code}): {error_msg}")
                 
                 return response.json()
@@ -198,7 +197,22 @@ class GeminiService:
             return []
 
     async def analyze_text(self, text: str) -> Dict[str, Any]:
-        """Analyze text using Gemini REST API."""
+        """
+        Analyze text using Gemini REST API with caching.
+        """
+        # Create a stable cache key
+        import hashlib
+        cache_key = hashlib.md5(text.encode('utf-8')).hexdigest()
+        
+        # Check cache
+        if hasattr(self, '_cache') and cache_key in self._cache:
+             logger.info(f"Cache hit for text analysis: {cache_key}")
+             cached_result = self._cache[cache_key].copy()
+             # Update timestamp to current time for the cached response
+             cached_result["timestamp"] = datetime.utcnow().isoformat() + "Z"
+             cached_result["id"] = str(uuid.uuid4()) # New ID for the cached response
+             return cached_result
+        
         input_preview = (text[:150] + '...') if len(text) > 150 else text
         prompt = self._get_fact_check_prompt() + f"\n\nText to analyze:\n{text}"
         
@@ -221,7 +235,7 @@ class GeminiService:
         claims, score = self._process_claims(result.get("claims", []))
         search_queries = self._extract_search_queries(response_data)
         
-        return {
+        final_result = {
             "id": str(uuid.uuid4()),
             "score": score,
             "summaryVerdict": result.get("summaryVerdict", ""),
@@ -230,6 +244,13 @@ class GeminiService:
             "timestamp": datetime.utcnow().isoformat() + "Z",
             "inputPreview": input_preview
         }
+
+        # Cache the result
+        if hasattr(self, '_cache'):
+            logger.info(f"Cache miss - storing result: {cache_key}")
+            self._cache[cache_key] = final_result
+        
+        return final_result
     
     async def analyze_image(self, file_content: bytes, filename: str, content_type: str) -> Dict[str, Any]:
         """Analyze image using Gemini REST API with multimodal input."""
