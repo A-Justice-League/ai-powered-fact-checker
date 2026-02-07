@@ -6,6 +6,7 @@ import type { Claim } from "@/data/mockData";
 interface Props {
   claim: Claim;
   index: number;
+  onShare?: () => void;
 }
 
 const verdictStyles = {
@@ -14,7 +15,7 @@ const verdictStyles = {
   UNSURE: "bg-warning text-brand-navy",
 };
 
-const ClaimCard = ({ claim, index }: Props) => {
+const ClaimCard = ({ claim, index, onShare }: Props) => {
   const [expanded, setExpanded] = useState(false);
   const [copied, setCopied] = useState(false);
 
@@ -65,6 +66,7 @@ const ClaimCard = ({ claim, index }: Props) => {
           {copied ? "Copied" : "Copy"}
         </button>
         <button
+          onClick={onShare}
           className="inline-flex items-center gap-1 text-xs text-brand-muted hover:text-brand-navy transition-colors focus:outline-none focus:ring-2 focus:ring-ring rounded px-2 py-1"
           aria-label="Share claim"
         >

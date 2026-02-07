@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import TextInputPanel from "@/components/TextInputPanel";
@@ -23,6 +23,49 @@ const Index = () => {
   const scrollToInput = () => {
     inputSectionRef.current?.scrollIntoView({ behavior: "smooth" });
     setTimeout(() => textRef.current?.focus(), 400);
+  };
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const resultParam = params.get("result");
+    if (resultParam) {
+      try {
+        const decoded = JSON.parse(decodeURIComponent(atob(resultParam)));
+        setResult(decoded);
+        // Scroll to results after a short delay to allow rendering
+        setTimeout(() => {
+          const resultsEl = document.querySelector('[aria-label="Analysis results"]');
+          resultsEl?.scrollIntoView({ behavior: "smooth" });
+        }, 500);
+      } catch (e) {
+        console.error("Failed to parse shared result", e);
+        toast({
+          title: "Error",
+          description: "Invalid shared link.",
+          variant: "destructive"
+        });
+      }
+    }
+  }, [toast]);
+
+  const handleShare = () => {
+    if (!result) return;
+    try {
+      const encoded = btoa(encodeURIComponent(JSON.stringify(result)));
+      const url = `${window.location.origin}${window.location.pathname}?result=${encoded}`;
+      navigator.clipboard.writeText(url);
+      toast({
+        title: "Link Copied!",
+        description: "Share this analysis result with others.",
+      });
+    } catch (e) {
+      console.error("Share error", e);
+      toast({
+        title: "Share Failed",
+        description: "Could not generate share link.",
+        variant: "destructive"
+      });
+    }
   };
 
   const clearHistory = () => {
@@ -133,7 +176,7 @@ const Index = () => {
         </div>
       </div>
 
-      <ResultsPanel result={result} isLoading={isLoading} />
+      <ResultsPanel result={result} isLoading={isLoading} onShare={handleShare} />
       <HistoryPanel history={history} onClearHistory={clearHistory} />
       <Footer />
     </div>

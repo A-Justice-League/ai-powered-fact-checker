@@ -6,6 +6,7 @@ import type { AnalysisResult } from "@/data/mockData";
 interface Props {
   result: AnalysisResult | null;
   isLoading: boolean;
+  onShare?: () => void;
 }
 
 const SkeletonCard = () => (
@@ -16,7 +17,7 @@ const SkeletonCard = () => (
   </div>
 );
 
-const ResultsPanel = ({ result, isLoading }: Props) => {
+const ResultsPanel = ({ result, isLoading, onShare }: Props) => {
   if (!isLoading && !result) return null;
 
   return (
@@ -48,7 +49,7 @@ const ResultsPanel = ({ result, isLoading }: Props) => {
               <CredibilityGauge score={result.score} verdict={result.summaryVerdict} />
               <div className="md:col-span-2 space-y-4">
                 {result.claims.map((claim, i) => (
-                  <ClaimCard key={claim.id} claim={claim} index={i} />
+                  <ClaimCard key={claim.id} claim={claim} index={i} onShare={onShare} />
                 ))}
               </div>
             </div>
