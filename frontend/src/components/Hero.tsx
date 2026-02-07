@@ -7,64 +7,101 @@ interface Props {
 }
 
 const Hero = ({ onCheckText, onUpload }: Props) => (
-  <section className="py-16 md:py-24">
-    <div className="container mx-auto px-4">
-      <div className="grid md:grid-cols-2 gap-12 items-center">
-        {/* Left */}
+  <section className="relative py-20 md:py-32 overflow-hidden">
+    {/* Geometric Background Shapes */}
+    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-brand-cyan/5 rounded-full blur-3xl -z-10 opacity-60 pointer-events-none" />
+    <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-brand-deep/5 rounded-full blur-3xl -z-10 opacity-60 pointer-events-none" />
+
+    <div className="container mx-auto px-4 z-10 relative">
+      <div className="grid lg:grid-cols-2 gap-16 items-center">
+        {/* Left Content */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+          className="text-center lg:text-left"
         >
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-brand-navy leading-tight tracking-tight">
-            Stop misinformation<br />
-            <span className="text-gradient">before you share it.</span>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-cyan/10 border border-brand-cyan/20 text-brand-cyan text-sm font-medium mb-6">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-cyan opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-brand-cyan"></span>
+            </span>
+            Powered by Gemini 1.5 Pro
+          </div>
+
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-brand-navy leading-[1.1] tracking-tight mb-6">
+            Verify info <br className="hidden md:block" />
+            <span className="text-transparent bg-clip-text bg-gradient-brand">instantly.</span>
           </h1>
-          <p className="mt-5 text-lg text-brand-muted max-w-lg leading-relaxed">
-            Paste text or upload a screenshot — VeriFact AI checks claims with Gemini 3 and live Google Search grounding. Fast, explainable, and citation-backed.
+
+          <p className="mt-6 text-lg md:text-xl text-brand-muted max-w-2xl mx-auto lg:mx-0 leading-relaxed">
+            Stop misinformation in its tracks. VeriFact AI uses advanced LLMs and real-time Google Grounding to fact-check text and images in seconds.
           </p>
-          <div className="mt-8 flex flex-wrap gap-3">
+
+          <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
             <button
               onClick={onCheckText}
-              className="inline-flex items-center gap-2 rounded-lg bg-gradient-brand px-6 py-3 text-sm font-semibold text-primary-foreground shadow-brand hover:shadow-card-hover hover:-translate-y-1 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+              className="group inline-flex items-center justify-center gap-2 rounded-xl bg-brand-navy dark:bg-brand-cyan px-8 py-4 text-base font-bold text-white dark:text-brand-navy shadow-lg shadow-brand-navy/20 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 ring-offset-background focus:ring-brand-cyan"
             >
-              Check Text <ArrowRight className="h-4 w-4" />
+              Start Fact Check
+              <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
             </button>
             <button
               onClick={onUpload}
-              className="inline-flex items-center gap-2 rounded-lg border-2 border-brand-deep px-6 py-3 text-sm font-semibold text-brand-deep hover:bg-brand-deep hover:text-primary-foreground hover:-translate-y-1 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+              className="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-neutral-light/60 dark:border-white/10 bg-card px-8 py-4 text-base font-bold text-brand-navy hover:bg-neutral-light/20 hover:border-brand-muted transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 ring-offset-background focus:ring-neutral-light"
             >
-              <Upload className="h-4 w-4" /> Upload Screenshot
+              <Upload className="h-5 w-5" />
+              Upload Image
             </button>
           </div>
         </motion.div>
 
-        {/* Right — mockup card */}
+        {/* Right — Interactive 3D-like Card */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="hidden md:block"
+          initial={{ opacity: 0, scale: 0.9, rotate: 6 }}
+          animate={{ opacity: 1, scale: 1, rotate: 0 }}
+          transition={{ duration: 0.8, type: "spring", bounce: 0.3 }}
+          className="hidden lg:block relative"
         >
-          <div className="rounded-2xl border border-neutral-light/60 bg-card p-6 shadow-card-hover relative overflow-hidden">
-            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-brand" />
-            <div className="flex items-center gap-4 mb-5">
-              <CredibilityRingMini score={72} />
-              <div>
-                <p className="font-bold text-brand-navy text-lg">72 / 100</p>
-                <p className="text-sm text-brand-muted">Mixed credibility</p>
+          {/* Decorative elements behind card */}
+          <div className="absolute -top-12 -right-12 w-24 h-24 bg-brand-cyan/20 rounded-full blur-2xl" />
+          <div className="absolute -bottom-8 -left-8 w-32 h-32 bg-brand-deep/20 rounded-full blur-2xl" />
+
+          <div className="relative rounded-3xl border border-white/20 bg-white/40 dark:bg-card/40 backdrop-blur-xl p-8 shadow-2xl hover:shadow-[0_20px_50px_rgba(0,0,0,0.12)] transition-shadow duration-500">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-8 border-b border-black/5 dark:border-white/5 pb-6">
+              <div className="flex items-center gap-4">
+                <div className="relative">
+                  <CredibilityRingMini score={85} />
+                  <div className="absolute inset-0 flex items-center justify-center font-bold text-brand-navy text-lg">85</div>
+                </div>
+                <div>
+                  <h3 className="font-bold text-brand-navy text-xl">Analysis Report</h3>
+                  <p className="text-sm text-brand-muted font-medium">Verified sources found</p>
+                </div>
+              </div>
+              <div className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider">
+                Verified
               </div>
             </div>
-            <div className="space-y-3">
+
+            {/* Staggered List */}
+            <div className="space-y-4">
               {[
-                { text: "Global temps rose 1.1°C", verdict: "TRUE" as const },
-                { text: "EVs have zero lifecycle emissions", verdict: "FALSE" as const },
-                { text: "AI passes Turing test consistently", verdict: "UNSURE" as const },
-              ].map((c, i) => (
-                <div key={i} className="flex items-center justify-between rounded-lg bg-surface/60 px-4 py-3">
-                  <span className="text-sm text-brand-navy font-medium truncate mr-3">{c.text}</span>
-                  <VerdictBadge verdict={c.verdict} />
-                </div>
+                { text: 'Global temperatures rose by 1.1°C since 1880.', verdict: 'TRUE', delay: 0.2 },
+                { text: 'Vaccines contain microchips for tracking.', verdict: 'FALSE', delay: 0.4 },
+                { text: 'Quantum computing breaks current encryption.', verdict: 'UNSURE', delay: 0.6 },
+              ].map((item, idx) => (
+                <motion.div
+                  key={idx}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.8 + item.delay, duration: 0.4 }}
+                  className="flex items-center justify-between p-4 rounded-xl bg-white/60 dark:bg-surface/60 border border-white/20 dark:border-white/5 shadow-sm"
+                >
+                  <p className="text-sm font-medium text-brand-navy pr-4">{item.text}</p>
+                  <VerdictBadge verdict={item.verdict as "TRUE" | "FALSE" | "UNSURE"} />
+                </motion.div>
               ))}
             </div>
           </div>
