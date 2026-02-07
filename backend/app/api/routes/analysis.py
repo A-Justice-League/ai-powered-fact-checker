@@ -65,3 +65,19 @@ async def analyze_image(file: UploadFile = File(...)):
             status_code=status_code,
             detail=error_msg
         )
+
+
+@router.get("/metrics")
+async def get_metrics():
+    """
+    Get application metrics, including cache statistics.
+    """
+    try:
+        gemini_service = get_gemini_service()
+        stats = gemini_service.get_cache_stats()
+        return {
+            "cache": stats
+        }
+    except Exception as e:
+         logger.error(f"Error getting metrics: {e}", exc_info=True)
+         return {"error": str(e)}

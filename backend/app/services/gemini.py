@@ -44,6 +44,9 @@ class GeminiService:
         from cachetools import TTLCache
         self._cache = TTLCache(maxsize=1000, ttl=86400)
         
+        # Simple stats tracking
+        self.cache_stats = {"hits": 0, "misses": 0, "total": 0}
+        
     def _get_fact_check_prompt(self) -> str:
         """
         Generate the fact-checking prompt for Gemini.
@@ -200,6 +203,8 @@ class GeminiService:
         """
         Analyze text using Gemini REST API with caching.
         """
+        self.cache_stats["total"] += 1
+        
         # Create a stable cache key
         import hashlib
         cache_key = hashlib.md5(text.encode('utf-8')).hexdigest()
@@ -207,6 +212,7 @@ class GeminiService:
         # Check cache
         if hasattr(self, '_cache') and cache_key in self._cache:
              logger.info(f"Cache hit for text analysis: {cache_key}")
+             self.cache_stats["hits"] += 1
              cached_result = self._cache[cache_key].copy()
              # Update timestamp to current time for the cached response
              cached_result["timestamp"] = datetime.utcnow().isoformat() + "Z"
@@ -248,9 +254,14 @@ class GeminiService:
         # Cache the result
         if hasattr(self, '_cache'):
             logger.info(f"Cache miss - storing result: {cache_key}")
+            self.cache_stats["misses"] += 1
             self._cache[cache_key] = final_result
         
         return final_result
+    
+    def get_cache_stats(self) -> Dict[str, int]:
+        """Return current cache statistics."""
+        return self.cache_stats
     
     async def analyze_image(self, file_content: bytes, filename: str, content_type: str) -> Dict[str, Any]:
         """Analyze image using Gemini REST API with multimodal input."""
