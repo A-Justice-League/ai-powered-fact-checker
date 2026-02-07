@@ -1,4 +1,4 @@
-import { useState, useRef, DragEvent } from "react";
+import { useState, useRef, type DragEvent, type ChangeEvent } from "react";
 import { Upload, ImageIcon, Loader2, CheckCircle2 } from "lucide-react";
 
 type UploadState = "idle" | "uploading" | "processing" | "done";
@@ -12,6 +12,7 @@ const ImageUploadPanel = ({ onUpload, isLoading }: Props) => {
   const [state, setState] = useState<UploadState>("idle");
   const [preview, setPreview] = useState<string | null>(null);
   const [dragActive, setDragActive] = useState(false);
+
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -22,7 +23,7 @@ const ImageUploadPanel = ({ onUpload, isLoading }: Props) => {
     setState("done");
   };
 
-  const handleDrop = (e: DragEvent) => {
+  const handleDrop = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setDragActive(false);
     const file = e.dataTransfer.files?.[0];
