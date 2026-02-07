@@ -9,11 +9,32 @@ interface Props {
   onShare?: () => void;
 }
 
-const SkeletonCard = () => (
-  <div className="rounded-xl border border-neutral-light/60 bg-card p-5 shadow-card animate-pulse">
-    <div className="h-4 w-3/4 rounded bg-surface mb-3" />
-    <div className="h-3 w-full rounded bg-surface mb-2" />
-    <div className="h-3 w-2/3 rounded bg-surface" />
+const SkeletonGauge = () => (
+  <div className="animate-pulse rounded-xl border border-neutral-light/60 bg-card p-8 flex flex-col items-center h-full justify-center">
+    <div className="h-40 w-40 rounded-full border-[12px] border-surface bg-transparent mb-6" />
+    <div className="h-6 w-32 rounded bg-surface mb-3" />
+    <div className="h-4 w-24 rounded bg-surface" />
+  </div>
+);
+
+const SkeletonCard = ({ index }: { index: number }) => (
+  <div
+    className="rounded-xl border border-neutral-light/60 bg-card p-5 shadow-card animate-pulse"
+    style={{ animationDelay: `${index * 150}ms` }}
+  >
+    <div className="flex items-start justify-between gap-3 mb-4">
+      <div className="h-5 w-3/4 rounded bg-surface" />
+      <div className="h-6 w-16 rounded-full bg-surface" />
+    </div>
+    <div className="space-y-2.5 mb-5">
+      <div className="h-3.5 w-full rounded bg-surface" />
+      <div className="h-3.5 w-[90%] rounded bg-surface" />
+      <div className="h-3.5 w-[95%] rounded bg-surface" />
+    </div>
+    <div className="flex flex-wrap gap-2 pt-3 border-t border-neutral-light/30">
+      <div className="h-6 w-24 rounded-full bg-surface" />
+      <div className="h-6 w-20 rounded-full bg-surface" />
+    </div>
   </div>
 );
 
@@ -33,14 +54,11 @@ const ResultsPanel = ({ result, isLoading, onShare }: Props) => {
 
         {isLoading ? (
           <div className="grid md:grid-cols-3 gap-6">
-            <div className="animate-pulse rounded-xl border border-neutral-light/60 bg-card p-8 flex flex-col items-center">
-              <div className="h-36 w-36 rounded-full bg-surface" />
-              <div className="mt-4 h-4 w-24 rounded bg-surface" />
-            </div>
+            <SkeletonGauge />
             <div className="md:col-span-2 space-y-4">
-              <SkeletonCard />
-              <SkeletonCard />
-              <SkeletonCard />
+              <SkeletonCard index={0} />
+              <SkeletonCard index={1} />
+              <SkeletonCard index={2} />
             </div>
           </div>
         ) : result ? (
