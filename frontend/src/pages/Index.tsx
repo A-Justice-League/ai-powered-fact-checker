@@ -6,8 +6,8 @@ import ImageUploadPanel from "@/components/ImageUploadPanel";
 import ResultsPanel from "@/components/ResultsPanel";
 import HistoryPanel from "@/components/HistoryPanel";
 import Footer from "@/components/Footer";
-import { mockHistory } from "@/data/mockData";
 import { useToast } from "@/hooks/use-toast";
+import useLocalStorage from "@/hooks/useLocalStorage";
 import type { AnalysisResult } from "@/data/mockData";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
@@ -15,7 +15,7 @@ const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 const Index = () => {
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [history, setHistory] = useState<AnalysisResult[]>(mockHistory);
+  const [history, setHistory] = useLocalStorage<AnalysisResult[]>("analysis-history", []);
   const textRef = useRef<HTMLTextAreaElement>(null);
   const inputSectionRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
@@ -23,6 +23,14 @@ const Index = () => {
   const scrollToInput = () => {
     inputSectionRef.current?.scrollIntoView({ behavior: "smooth" });
     setTimeout(() => textRef.current?.focus(), 400);
+  };
+
+  const clearHistory = () => {
+    setHistory([]);
+    toast({
+      title: "History Cleared",
+      description: "Analysis history has been cleared.",
+    });
   };
 
   const handleAnalyze = async (text: string) => {
@@ -44,7 +52,7 @@ const Index = () => {
 
       const data: AnalysisResult = await response.json();
       setResult(data);
-      setHistory((prev) => [data, ...prev]);
+      setHistory((prev) => [data, ...prev].slice(0, 50));
 
       toast({
         title: "Analysis Complete",
@@ -88,7 +96,7 @@ const Index = () => {
 
       const data: AnalysisResult = await response.json();
       setResult(data);
-      setHistory((prev) => [data, ...prev]);
+      setHistory((prev) => [data, ...prev].slice(0, 50));
 
       toast({
         title: "Image Analysis Complete",
@@ -126,7 +134,7 @@ const Index = () => {
       </div>
 
       <ResultsPanel result={result} isLoading={isLoading} />
-      <HistoryPanel history={history} />
+      <HistoryPanel history={history} onClearHistory={clearHistory} />
       <Footer />
     </div>
   );
