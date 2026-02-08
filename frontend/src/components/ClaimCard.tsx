@@ -17,12 +17,39 @@ const verdictStyles = {
 const ClaimCard = ({ claim, index }: Props) => {
   const [expanded, setExpanded] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [shared, setShared] = useState(false);
 
   const copyText = () => {
     navigator.clipboard.writeText(claim.text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
+
+  const shareClaim = async () => {
+    const shareText = `Claim: ${claim.text}\nVerdict: ${claim.verdict}\nExplanation: ${claim.explanation}`;
+    const shareUrl = claim.sources?.[0]?.url || window.location.href;
+
+    try {
+      // Web Share API (best UX where supported)
+      if (navigator.share) {
+        await navigator.share({
+          title: "Fact Check Result",
+          text: shareText,
+          url: shareUrl,
+        });
+        setShared(true);
+        setTimeout(() => setShared(false), 2000);
+        return;
+      }
+
+      // Fallback: copy something shareable
+      await navigator.clipboard.writeText(`${shareText}\n\nSource: ${shareUrl}`);
+      setShared(true);
+      setTimeout(() => setShared(false), 2000);
+    } catch {
+      alert("Sharing failed on this browser. Try copying instead.");
+    }
+  }
 
   return (
     <motion.div
