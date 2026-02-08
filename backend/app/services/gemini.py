@@ -6,9 +6,13 @@ import json
 import re
 import uuid
 import base64
+import logging
 import httpx
 from datetime import datetime
 from typing import Dict, Any
+from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type, before_sleep_log
+
+logger = logging.getLogger(__name__)
 
 from app.core.config import settings
 from app.models.schemas import Source, Claim
@@ -122,6 +126,12 @@ class GeminiService:
         score = calculate_credibility_score(valid_raw_claims)
         return claims, score
 
+    @retry(
+        stop=stop_after_attempt(3),
+        wait=wait_exponential(multiplier=1, min=2, max=10),
+        retry=retry_if_exception_type((httpx.NetworkError, httpx.TimeoutException, httpx.HTTPStatusError)),
+        before_sleep=before_sleep_log(logger, logging.WARNING)
+    )
     async def _make_request(self, payload: Dict[str, Any]) -> Dict[str, Any]:
         """Helper to make the REST call to Gemini API."""
         url = f"{self.base_url}/models/{self.model}:generateContent?key={self.api_key}"
@@ -130,12 +140,21 @@ class GeminiService:
             response = await client.post(url, json=payload)
             
             if response.status_code != 200:
+                # Log the error details before raising
                 error_msg = response.text
                 try:
                     error_json = response.json()
                     error_msg = error_json.get("error", {}).get("message", response.text)
                 except:
                     pass
+                
+                logger.error(f"Gemini API request failed: {response.status_code} - {error_msg}")
+                
+                # Raise HTTPStatusError to trigger retry for 5xx and 429 errors
+                if response.status_code >= 500 or response.status_code == 429:
+                    response.raise_for_status()
+                
+                # Examples of non-retryable errors: 400 (Bad Request), 401 (Unauthorized)
                 raise Exception(f"Gemini API Error ({response.status_code}): {error_msg}")
             
             return response.json()
