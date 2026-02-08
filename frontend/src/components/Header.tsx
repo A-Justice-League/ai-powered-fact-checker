@@ -4,9 +4,9 @@ import logo from "@/assets/logo-verifact.jpeg";
 import HowItWorksModal from "./HowItWorksModal";
 
 const navLinks = [
-  { label: "Docs", href: "#" },
+  { label: "Docs", href: "https://github.com/A-Justice-League/ai-powered-fact-checker/blob/main/README.md" },
   { label: "Demo", href: "#" },
-  { label: "GitHub", href: "#" },
+  { label: "GitHub", href: "https://github.com/A-Justice-League/ai-powered-fact-checker" },
 ];
 
 const Header = () => {
