@@ -22,7 +22,14 @@ class Settings(BaseSettings):
     gemini_model: str = "gemini-2.0-flash"
     
     # CORS Configuration
-    cors_origins: list[str] = ["*"]  # In production, use specific origins
+    cors_origins: list[str] = [
+        "http://localhost:5173",
+        "http://localhost:3000",
+        "http://localhost:8000",
+        "http://localhost",
+        "https://myaipoweredfactchecker.vercel.app",
+        "https://myaipoweredfactchecker.vercel.app/",
+    ]
     
     class Config:
         env_file = ".env"
