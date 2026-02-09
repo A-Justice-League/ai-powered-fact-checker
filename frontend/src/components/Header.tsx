@@ -1,5 +1,6 @@
-import { useState } from "react";
-import { Menu, X, HelpCircle } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Menu, X, HelpCircle, Sun, Moon } from "lucide-react";
+import { useTheme } from "next-themes";
 import logo from "@/assets/logo-verifact.jpeg";
 import HowItWorksModal from "./HowItWorksModal";
 
@@ -12,10 +13,16 @@ const navLinks = [
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [howOpen, setHowOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const { theme, setTheme } = useTheme();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <>
-      <header className="sticky top-0 z-50 w-full border-b border-neutral-light/50 bg-card/80 backdrop-blur-md">
+      <header className="sticky top-0 z-50 w-full border-b border-neutral-light/50 bg-card/80 backdrop-blur-md transition-colors duration-300">
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
           <div className="flex items-center gap-3">
             <img src={logo} alt="VeriFact AI" className="h-9 w-9 rounded-lg" />
@@ -41,6 +48,13 @@ const Header = () => {
               <HelpCircle className="h-4 w-4" />
               How it works
             </button>
+            <button
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              className="ml-2 flex h-9 w-9 items-center justify-center rounded-md border border-neutral-light/60 bg-surface/50 text-brand-muted transition-colors hover:bg-surface hover:text-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-cyan"
+              aria-label="Toggle theme"
+            >
+              {mounted && (theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />)}
+            </button>
           </nav>
 
           <button
@@ -63,6 +77,13 @@ const Header = () => {
                 {l.label}
               </a>
             ))}
+            <button
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              className="flex w-full items-center justify-between py-2 text-sm font-medium text-brand-muted hover:text-brand-navy"
+            >
+              <span>Theme</span>
+              {mounted && (theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />)}
+            </button>
             <button
               onClick={() => { setHowOpen(true); setMenuOpen(false); }}
               className="block py-2 text-sm font-medium text-brand-muted hover:text-brand-cyan"

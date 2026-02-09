@@ -6,13 +6,28 @@ import json
 import re
 import uuid
 import base64
+import logging
 import httpx
+import logging
 from datetime import datetime
 from typing import Dict, Any
+from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type, before_sleep_log
+
+logger = logging.getLogger(__name__)
+
+from tenacity import (
+    retry,
+    stop_after_attempt,
+    wait_exponential,
+    retry_if_exception_type,
+    before_sleep_log
+)
 
 from app.core.config import settings
 from app.models.schemas import Source, Claim
 from app.utils.scoring import calculate_credibility_score
+
+logger = logging.getLogger(__name__)
 
 
 class GeminiService:
@@ -28,23 +43,42 @@ class GeminiService:
         # Use the standard Generative Language API endpoint
         self.base_url = "https://generativelanguage.googleapis.com/v1beta"
         
+        # Initialize in-memory cache
+        # Max 1000 items, expires in 24 hours
+        from cachetools import TTLCache
+        self._cache = TTLCache(maxsize=1000, ttl=86400)
+        
+        # Simple stats tracking
+        self.cache_stats = {"hits": 0, "misses": 0, "total": 0}
+        
     def _get_fact_check_prompt(self) -> str:
         """
         Generate the fact-checking prompt for Gemini.
         """
         return """
-        You are a professional fact-checking assistant. 
-        Analyze the provided content and extract the key factual claims.
-        For each claim, use Google Search to verify its accuracy.
-        
-        Response Format Schema:
+        You are a professional fact-checking assistant, acting as a diligent application of specific verification protocols.
+        Your goal is to identify factual claims in the provided text and verify them using Google Search.
+
+        *** STRICT VERIFICATION PROTOCOLS ***
+        1. **Extraction**: Identify clear, verifiable factual claims (statistics, dates, events, legislation, quotes). Ignore subjective opinions, predictions, or vague statements.
+        2. **Verification**: For EACH extracted claim, use Google Search to find authoritative evidence.
+        3. **Source Evaluation**: Prioritize official government sites, major news outlets, and academic institutions. Be skeptical of blog posts or heavily biased sources.
+        4. **Cross-Referencing**: Attempt to find at least two independent sources for controversial or surprising claims.
+        5. **Synthesis**:
+            - If sources confirm the claim, mark as TRUE.
+            - If sources contradict the claim, mark as FALSE and explain the contradiction.
+            - If sources are conflicting or insufficient, mark as UNSURE.
+            - If the claim is partially true but misses context, mark as FALSE (or clarify in explanation) and explain the missing context.
+
+        *** RESPONSE SCHEMA ***
+        Return the result **exclusively** as a valid JSON object matching this structure:
         {
-            "summaryVerdict": "A brief overview of the overall truthfulness",
+            "summaryVerdict": "A neutral, professional summary of the overall accuracy (2-3 sentences).",
             "claims": [
                 {
-                    "text": "The exact claim extracted",
+                    "text": "The exact claim verbatim from the text",
                     "verdict": "TRUE" | "FALSE" | "UNSURE",
-                    "explanation": "Brief reasoning based on search results",
+                    "explanation": "A concise, objective analysis citing the evidence found. Mention if the claim is misleading or lacks context.",
                     "sources": [
                         {
                             "domain": "example.com",
@@ -114,7 +148,7 @@ class GeminiService:
             claims.append(Claim(
                 id=claim_id,
                 text=c.get("text", ""),
-                verdict=c.get("verdict", "UNSURE"),
+                verdict=c.get("verdict", "UNSURE").upper(),
                 explanation=c.get("explanation", ""),
                 sources=[Source(**s) for s in c.get("sources", []) if isinstance(s, dict)]
             ))
@@ -122,23 +156,44 @@ class GeminiService:
         score = calculate_credibility_score(valid_raw_claims)
         return claims, score
 
+    @retry(
+        stop=stop_after_attempt(3),
+        wait=wait_exponential(multiplier=1, min=2, max=10),
+        reraise=True,
+        before_sleep=before_sleep_log(logger, logging.WARNING)
+    )
     async def _make_request(self, payload: Dict[str, Any]) -> Dict[str, Any]:
         """Helper to make the REST call to Gemini API."""
         url = f"{self.base_url}/models/{self.model}:generateContent?key={self.api_key}"
         
         async with httpx.AsyncClient(timeout=60.0) as client:
-            response = await client.post(url, json=payload)
-            
-            if response.status_code != 200:
-                error_msg = response.text
-                try:
-                    error_json = response.json()
-                    error_msg = error_json.get("error", {}).get("message", response.text)
-                except:
-                    pass
-                raise Exception(f"Gemini API Error ({response.status_code}): {error_msg}")
-            
-            return response.json()
+            try:
+                response = await client.post(url, json=payload)
+                
+                if response.status_code != 200:
+                    error_msg = response.text
+                    try:
+                        error_json = response.json()
+                        error_msg = error_json.get("error", {}).get("message", response.text)
+                    except:
+                        pass
+                    
+                    # Handle specific error types
+                    if response.status_code == 429:
+                        # 429 Resource Exhausted is transient (after wait)
+                        raise Exception(f"Gemini Rate Limit (429): {error_msg}")
+                    elif response.status_code >= 500:
+                        # 5xx Server Errors are transient
+                        raise Exception(f"Gemini Server Error ({response.status_code}): {error_msg}")
+                    else:
+                        # 4xx Client Errors are permanent
+                        raise Exception(f"Gemini Client Error ({response.status_code}): {error_msg}")
+                
+                return response.json()
+                
+            except httpx.HTTPError as e:
+                # Network issues are transient
+                raise Exception(f"Gemini Network Error: {str(e)}")
 
     def _extract_search_queries(self, response_data: Dict[str, Any]) -> list[str]:
         """Extract search queries from Gemini's grounding metadata."""
@@ -149,7 +204,25 @@ class GeminiService:
             return []
 
     async def analyze_text(self, text: str) -> Dict[str, Any]:
-        """Analyze text using Gemini REST API."""
+        """
+        Analyze text using Gemini REST API with caching.
+        """
+        self.cache_stats["total"] += 1
+        
+        # Create a stable cache key
+        import hashlib
+        cache_key = hashlib.md5(text.encode('utf-8')).hexdigest()
+        
+        # Check cache
+        if hasattr(self, '_cache') and cache_key in self._cache:
+             logger.info(f"Cache hit for text analysis: {cache_key}")
+             self.cache_stats["hits"] += 1
+             cached_result = self._cache[cache_key].copy()
+             # Update timestamp to current time for the cached response
+             cached_result["timestamp"] = datetime.utcnow().isoformat() + "Z"
+             cached_result["id"] = str(uuid.uuid4()) # New ID for the cached response
+             return cached_result
+        
         input_preview = (text[:150] + '...') if len(text) > 150 else text
         prompt = self._get_fact_check_prompt() + f"\n\nText to analyze:\n{text}"
         
@@ -172,7 +245,7 @@ class GeminiService:
         claims, score = self._process_claims(result.get("claims", []))
         search_queries = self._extract_search_queries(response_data)
         
-        return {
+        final_result = {
             "id": str(uuid.uuid4()),
             "score": score,
             "summaryVerdict": result.get("summaryVerdict", ""),
@@ -181,6 +254,18 @@ class GeminiService:
             "timestamp": datetime.utcnow().isoformat() + "Z",
             "inputPreview": input_preview
         }
+
+        # Cache the result
+        if hasattr(self, '_cache'):
+            logger.info(f"Cache miss - storing result: {cache_key}")
+            self.cache_stats["misses"] += 1
+            self._cache[cache_key] = final_result
+        
+        return final_result
+    
+    def get_cache_stats(self) -> Dict[str, int]:
+        """Return current cache statistics."""
+        return self.cache_stats
     
     async def analyze_image(self, file_content: bytes, filename: str, content_type: str) -> Dict[str, Any]:
         """Analyze image using Gemini REST API with multimodal input."""

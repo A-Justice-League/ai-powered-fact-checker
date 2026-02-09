@@ -4,9 +4,12 @@ import type { AnalysisResult } from "@/data/mockData";
 
 interface Props {
   history: AnalysisResult[];
+  onClearHistory: () => void;
 }
 
-const HistoryPanel = ({ history }: Props) => {
+import { AnimatePresence, motion } from "framer-motion";
+
+const HistoryPanel = ({ history, onClearHistory }: Props) => {
   const [open, setOpen] = useState(false);
 
   if (history.length === 0) return null;
@@ -44,9 +47,9 @@ const HistoryPanel = ({ history }: Props) => {
                   <Download className="h-3.5 w-3.5" /> PDF
                 </button>
               </div>
-            ))}
-          </div>
-        )}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </section>
   );

@@ -9,7 +9,10 @@ The AI-Powered Fact Checker is a full-stack web application that leverages **Gem
 
 ### Backend
 - **Framework**: FastAPI (Python 3.12+)
-- **AI Engine**: Gemini 2.0 Flash (via `google-genai` SDK)
+- **AI Engine**: Gemini 2.0 Flash (via # Architecture Overview
+
+## System Description
+The AI-Powered Fact Checker is a full-stack web application that leverages **Gemini 3** with **Google S`google-genai` SDK)
 - **Search Grounding**: Google Search API integration
 - **API Design**: RESTful JSON endpoints with CORS support
 - **Environment Management**: `python-dotenv`
