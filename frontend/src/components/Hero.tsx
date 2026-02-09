@@ -61,7 +61,7 @@ const Hero = ({ onCheckText, onUpload }: Props) => (
           initial={{ opacity: 0, scale: 0.9, rotate: 6 }}
           animate={{ opacity: 1, scale: 1, rotate: 0 }}
           transition={{ duration: 0.8, type: "spring", bounce: 0.3 }}
-          className="hidden lg:block relative"
+          className="relative"
         >
           {/* Decorative elements behind card */}
           <div className="absolute -top-12 -right-12 w-24 h-24 bg-brand-cyan/20 rounded-full blur-2xl" />
