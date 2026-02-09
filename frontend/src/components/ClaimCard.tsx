@@ -20,7 +20,7 @@ const ClaimCard = ({ claim, index }: Props) => {
   const [shared, setShared] = useState(false);
 
   const copyText = () => {
-    navigator.clipboard.writeText(claim.text);
+    navigator.clipboard.writeText(claim.explanation);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -81,7 +81,7 @@ const ClaimCard = ({ claim, index }: Props) => {
             href={s.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 rounded-full bg-brand-navy/5 border border-brand-navy/10 px-3 py-1.5 text-xs text-brand-deep font-medium hover:bg-brand-navy/10 hover:border-brand-navy/30 transition-all duration-200"
+            className="inline-flex items-center gap-1.5 rounded-full bg-brand-navy/5 border border-brand-navy/10 px-3 py-1.5 text-xs text-brand-deep dark:text-gray-200 dark:bg-white/10 dark:border-white/10 font-medium hover:bg-brand-navy/10 dark:hover:bg-white/20 hover:border-brand-navy/30 dark:hover:border-white/30 transition-all duration-200"
           >
             <span className="w-1.5 h-1.5 rounded-full bg-brand-cyan/70"></span>
             {s.domain}
@@ -95,10 +95,10 @@ const ClaimCard = ({ claim, index }: Props) => {
           <button
             onClick={copyText}
             className="inline-flex items-center gap-1.5 text-xs font-medium text-brand-muted hover:text-brand-cyan bg-transparent hover:bg-brand-cyan/10 px-2.5 py-1.5 rounded transition-colors focus:outline-none focus:ring-2 focus:ring-brand-cyan/50"
-            aria-label="Copy claim text"
+            aria-label="Copy AI explanation"
           >
             {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
-            {copied ? "Copied" : "Copy Text"}
+            {copied ? "Copied" : "Copy Explanation"}
           </button>
           <button
             onClick={shareClaim}
@@ -127,13 +127,13 @@ const ClaimCard = ({ claim, index }: Props) => {
       >
         <div className="pt-4 space-y-3">
           <div className="bg-brand-navy/5 dark:bg-white/5 rounded-xl p-4 border border-brand-navy/5 dark:border-white/5">
-            <p className="text-xs font-bold text-brand-navy uppercase tracking-wider mb-3">Grounding Metadata</p>
+            <p className="text-xs font-bold text-brand-navy dark:text-gray-200 uppercase tracking-wider mb-3">Grounding Metadata</p>
             <div className="space-y-2">
               {claim.sources.map((s, i) => (
                 <div key={i} className="group/link flex items-start gap-3 p-2 rounded-lg hover:bg-white/50 dark:hover:bg-white/5 transition-colors">
                   <div className="mt-1 min-w-[4px] h-[4px] rounded-full bg-brand-cyan/50 group-hover/link:bg-brand-cyan transition-colors" />
                   <div>
-                    <a href={s.url} target="_blank" rel="noopener noreferrer" className="text-sm font-semibold text-brand-navy hover:text-brand-cyan hover:underline decoration-brand-cyan/30 underline-offset-4 transition-colors display-block">
+                    <a href={s.url} target="_blank" rel="noopener noreferrer" className="text-sm font-semibold text-brand-navy dark:text-gray-100 hover:text-brand-cyan dark:hover:text-brand-cyan hover:underline decoration-brand-cyan/30 underline-offset-4 transition-colors display-block">
                       {s.title}
                     </a>
                     <p className="text-xs text-brand-muted mt-0.5">{s.domain}</p>

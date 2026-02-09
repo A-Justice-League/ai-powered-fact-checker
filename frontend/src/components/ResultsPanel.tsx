@@ -66,7 +66,7 @@ const ResultsPanel = ({ result, isLoading, onShare }: Props) => {
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="text-2xl font-bold text-brand-navy"
+            className="text-2xl font-bold text-brand-navy dark:text-white"
           >
             Analysis Results
           </motion.h2>
@@ -119,20 +119,20 @@ const ResultsPanel = ({ result, isLoading, onShare }: Props) => {
             {result.searchQueries && result.searchQueries.length > 0 && (
               <motion.div
                 variants={itemVariants}
-                className="mt-12 p-6 rounded-2xl bg-brand-navy/5 border border-brand-navy/10"
+                className="mt-12 p-6 rounded-2xl bg-brand-navy/5 dark:bg-white/5 border border-brand-navy/10 dark:border-white/10"
               >
                 <div className="flex items-center gap-2 mb-4">
                   <div className="w-2 h-2 rounded-full bg-brand-cyan animate-pulse" />
-                  <h3 className="text-lg font-semibold text-brand-navy">Gemini 3 Grounding Queries</h3>
+                  <h3 className="text-lg font-semibold text-brand-navy dark:text-white">Gemini 3 Grounding Queries</h3>
                 </div>
-                <p className="text-sm text-brand-muted mb-4">
+                <p className="text-sm text-brand-muted dark:text-neutral-400 mb-4">
                   To verify these claims, Gemini generated and executed the following Google Search queries in real-time:
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {result.searchQueries.map((query, i) => (
                     <span
                       key={i}
-                      className="px-3 py-1.5 rounded-full bg-white border border-brand-navy/10 text-brand-navy text-sm font-medium shadow-sm hover:border-brand-cyan/30 transition-colors"
+                      className="px-3 py-1.5 rounded-full bg-white dark:bg-white/10 border border-brand-navy/10 dark:border-white/10 text-brand-navy dark:text-neutral-200 text-sm font-medium shadow-sm hover:border-brand-cyan/30 dark:hover:border-brand-cyan/30 transition-colors"
                     >
                       🔍 {query}
                     </span>
