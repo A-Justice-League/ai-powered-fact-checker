@@ -6,4 +6,5 @@ python-dotenv
 pydantic
 pydantic-settings
 tenacity
+cachetools
 httpx

@@ -2,12 +2,17 @@
 FastAPI application entry point.
 Initializes the app, configures CORS, and registers routes.
 """
+import uuid
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.requests import Request
 
 from app.core.config import settings
 from app.api.routes import health, analysis
+from app.core.logging import setup_logging, request_id_ctx_var
 
+# Initialize logging on module import
+setup_logging()
 
 def create_app() -> FastAPI:
     """
@@ -22,6 +27,18 @@ def create_app() -> FastAPI:
         debug=settings.debug
     )
     
+    # Request ID Middleware
+    @app.middleware("http")
+    async def request_id_middleware(request: Request, call_next):
+        request_id = request.headers.get("X-Request-ID", str(uuid.uuid4()))
+        token = request_id_ctx_var.set(request_id)
+        try:
+            response = await call_next(request)
+            response.headers["X-Request-ID"] = request_id
+            return response
+        finally:
+            request_id_ctx_var.reset(token)
+
     # Configure CORS
     app.add_middleware(
         CORSMiddleware,
