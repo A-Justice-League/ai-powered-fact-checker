@@ -26,7 +26,7 @@ const Hero = ({ onCheckText, onUpload }: Props) => (
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-cyan opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-brand-cyan"></span>
             </span>
-            Powered by Gemini 1.5 Pro
+            Powered by Gemini 3
           </div>
 
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-brand-navy leading-[1.1] tracking-tight mb-6">
