@@ -9,17 +9,17 @@ interface Props {
 const Hero = ({ onCheckText, onUpload }: Props) => (
   <section className="relative py-20 md:py-32 overflow-hidden">
     {/* Geometric Background Shapes */}
-    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-brand-cyan/5 rounded-full blur-3xl -z-10 opacity-60 pointer-events-none" />
+    <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-brand-cyan/5 rounded-full blur-3xl -z-10 opacity-40 pointer-events-none" />
     <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-brand-deep/5 rounded-full blur-3xl -z-10 opacity-60 pointer-events-none" />
 
-    <div className="container mx-auto px-4 z-10 relative">
+    <div className="container mx-auto px-4 z-20 relative">
       <div className="grid lg:grid-cols-2 gap-16 items-center">
         {/* Left Content */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
-          className="text-center lg:text-left"
+          className="text-center lg:text-left relative z-30"
         >
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-cyan/10 border border-brand-cyan/20 text-brand-cyan text-sm font-medium mb-6">
             <span className="relative flex h-2 w-2">
