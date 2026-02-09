@@ -6,10 +6,14 @@ import json
 import re
 import uuid
 import base64
+import logging
 import httpx
 import logging
 from datetime import datetime
 from typing import Dict, Any
+from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type, before_sleep_log
+
+logger = logging.getLogger(__name__)
 
 from tenacity import (
     retry,
