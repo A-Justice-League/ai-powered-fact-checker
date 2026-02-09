@@ -83,7 +83,7 @@ const ImageUploadPanel = ({ onUpload, isLoading }: Props) => {
         )}
 
         {state === "processing" && (
-          <div className="flex flex-col items-center gap-2 text-brand-deep">
+          <div className="flex flex-col items-center gap-2 text-brand-deep dark:text-white">
             <Loader2 className="h-8 w-8 animate-spin" />
             <p className="text-sm font-medium">Running OCR...</p>
           </div>

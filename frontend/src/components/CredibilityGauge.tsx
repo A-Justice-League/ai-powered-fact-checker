@@ -74,7 +74,7 @@ const CredibilityGauge = ({ score, verdict }: Props) => {
       </div>
 
       <div className="mt-6 text-center">
-        <h3 className="text-xl font-bold text-brand-navy mb-1">{verdict}</h3>
+        <h3 className="text-xl font-bold text-brand-navy dark:text-white mb-1">{verdict}</h3>
         <div className="h-1 w-12 rounded-full bg-gradient-to-r from-transparent via-brand-muted/30 to-transparent mx-auto" />
         <p className="text-xs font-medium text-brand-muted mt-2 uppercase tracking-wide">Credibility Rating</p>
       </div>
