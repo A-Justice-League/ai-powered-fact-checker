@@ -13,13 +13,13 @@ const CredibilityGauge = ({ score, verdict }: Props) => {
 
   useEffect(() => {
     let frame: number;
-    const duration = 1200;
+    const duration = 1500;
     const start = performance.now();
 
     const animate = (now: number) => {
       const elapsed = now - start;
       const progress = Math.min(elapsed / duration, 1);
-      const eased = 1 - Math.pow(1 - progress, 3);
+      const eased = 1 - Math.pow(1 - progress, 4); // Quartic ease-out
       setAnimatedScore(Math.round(eased * score));
       if (progress < 1) frame = requestAnimationFrame(animate);
     };
@@ -29,40 +29,55 @@ const CredibilityGauge = ({ score, verdict }: Props) => {
   }, [score]);
 
   const getColor = () => {
-    if (score >= 70) return "text-brand-cyan";
-    if (score >= 40) return "text-warning";
-    return "text-danger";
+    if (score >= 70) return "text-brand-cyan drop-shadow-[0_0_8px_rgba(107,166,190,0.5)]";
+    if (score >= 40) return "text-warning drop-shadow-[0_0_8px_rgba(240,180,41,0.5)]";
+    return "text-danger drop-shadow-[0_0_8px_rgba(232,91,91,0.5)]";
+  };
+
+  const getStrokeColor = () => {
+    if (score >= 70) return "#6BA6BE"; // brand-cyan
+    if (score >= 40) return "#F0B429"; // warning
+    return "#E85B5B"; // danger
   };
 
   return (
-    <div className="flex flex-col items-center rounded-xl border border-neutral-light/60 bg-card p-8 shadow-card">
-      <div className="relative">
-        <svg width="140" height="140" viewBox="0 0 120 120">
-          <circle cx="60" cy="60" r={radius} fill="none" stroke="hsl(207,28%,31%)" strokeWidth="8" opacity="0.1" />
+    <div className="flex flex-col items-center rounded-2xl border border-white/20 bg-white/60 dark:bg-card/40 backdrop-blur-md p-8 shadow-xl transition-transform hover:scale-[1.02] duration-300">
+      <div className="relative group cursor-default">
+        {/* Glow effect */}
+        <div className={`absolute inset-0 rounded-full blur-2xl opacity-20 transition-colors duration-500`} style={{ backgroundColor: getStrokeColor() }} />
+
+        <svg width="160" height="160" viewBox="0 0 140 140" className="relative z-10">
+          {/* Background Track */}
+          <circle cx="70" cy="70" r={radius} fill="none" className="stroke-neutral-light/30 dark:stroke-white/10" strokeWidth="12" />
+
+          {/* Progress Arc */}
           <circle
-            cx="60" cy="60" r={radius}
+            cx="70" cy="70" r={radius}
             fill="none"
-            stroke="url(#scoreGrad)"
-            strokeWidth="8"
+            stroke={getStrokeColor()}
+            strokeWidth="12"
             strokeLinecap="round"
             strokeDasharray={circumference}
             strokeDashoffset={offset}
-            transform="rotate(-90 60 60)"
-            className="transition-all duration-100"
+            transform="rotate(-90 70 70)"
+            className="transition-all duration-300 ease-out drop-shadow-sm"
           />
-          <defs>
-            <linearGradient id="scoreGrad" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stopColor="#6BA6BE" />
-              <stop offset="100%" stopColor="#36526A" />
-            </linearGradient>
-          </defs>
         </svg>
-        <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className={`text-4xl font-extrabold ${getColor()}`}>{animatedScore}</span>
-          <span className="text-xs text-brand-muted font-medium">/ 100</span>
+
+        {/* Center Text */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center z-20 pt-2">
+          <span className={`text-[3.5rem] font-black tracking-tighter leading-none ${getColor()} transition-colors duration-300`}>
+            {animatedScore}
+          </span>
+          <span className="text-xs font-bold uppercase tracking-widest text-brand-muted/70 mt-1">Score</span>
         </div>
       </div>
-      <p className="mt-4 text-center text-sm font-medium text-brand-navy max-w-[200px]">{verdict}</p>
+
+      <div className="mt-6 text-center">
+        <h3 className="text-xl font-bold text-brand-navy mb-1">{verdict}</h3>
+        <div className="h-1 w-12 rounded-full bg-gradient-to-r from-transparent via-brand-muted/30 to-transparent mx-auto" />
+        <p className="text-xs font-medium text-brand-muted mt-2 uppercase tracking-wide">Credibility Rating</p>
+      </div>
     </div>
   );
 };
