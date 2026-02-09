@@ -144,7 +144,7 @@ class GeminiService:
             claims.append(Claim(
                 id=claim_id,
                 text=c.get("text", ""),
-                verdict=c.get("verdict", "UNSURE"),
+                verdict=c.get("verdict", "UNSURE").upper(),
                 explanation=c.get("explanation", ""),
                 sources=[Source(**s) for s in c.get("sources", []) if isinstance(s, dict)]
             ))
