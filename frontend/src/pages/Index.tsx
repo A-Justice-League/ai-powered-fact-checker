@@ -49,21 +49,35 @@ const Index = () => {
     }
   }, [toast]);
 
-  const handleShare = () => {
+  const handleShare = async () => {
     if (!result) return;
     try {
       const encoded = btoa(encodeURIComponent(JSON.stringify(result)));
       const url = `${window.location.origin}${window.location.pathname}?result=${encoded}`;
-      navigator.clipboard.writeText(url);
-      toast({
-        title: "Link Copied!",
-        description: "Share this analysis result with others.",
-      });
+      const shareData = {
+        title: "AI Fact Check Result",
+        text: `Check out this fact check analysis: ${result.summaryVerdict}`,
+        url: url,
+      };
+
+      if (navigator.share) {
+        await navigator.share(shareData);
+        toast({
+          title: "Shared Successfully",
+          description: "Analysis result shared.",
+        });
+      } else {
+        await navigator.clipboard.writeText(url);
+        toast({
+          title: "Link Copied!",
+          description: "Share this analysis result with others.",
+        });
+      }
     } catch (e) {
       console.error("Share error", e);
       toast({
         title: "Share Failed",
-        description: "Could not generate share link.",
+        description: "Could not share or copy link.",
         variant: "destructive"
       });
     }
