@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { Share2 } from "lucide-react";
 import CredibilityGauge from "./CredibilityGauge";
 import ClaimCard from "./ClaimCard";
 import type { AnalysisResult } from "@/data/mockData";
@@ -60,14 +61,30 @@ const ResultsPanel = ({ result, isLoading, onShare }: Props) => {
   return (
     <section className="py-12" aria-live="polite" aria-label="Analysis results">
       <div className="container mx-auto px-4">
-        <motion.h2
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="text-2xl font-bold text-brand-navy mb-8"
-        >
-          Analysis Results
-        </motion.h2>
+        <div className="flex items-center justify-between mb-8">
+          <motion.h2
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="text-2xl font-bold text-brand-navy"
+          >
+            Analysis Results
+          </motion.h2>
+
+          {onShare && !isLoading && result && (
+            <motion.button
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={onShare}
+              className="flex items-center gap-2 px-4 py-2 bg-brand-cyan/10 text-brand-cyan font-semibold rounded-full border border-brand-cyan/20 hover:bg-brand-cyan/20 transition-all"
+            >
+              <Share2 className="w-4 h-4" />
+              Share Result
+            </motion.button>
+          )}
+        </div>
 
         {isLoading ? (
           <div className="grid md:grid-cols-3 gap-6">
@@ -92,7 +109,7 @@ const ResultsPanel = ({ result, isLoading, onShare }: Props) => {
               <div className="md:col-span-2 space-y-4">
                 {result.claims.map((claim, i) => (
                   <motion.div key={claim.id} variants={itemVariants} custom={i}>
-                    <ClaimCard claim={claim} index={i} onShare={onShare} />
+                    <ClaimCard claim={claim} index={i} />
                   </motion.div>
                 ))}
               </div>
