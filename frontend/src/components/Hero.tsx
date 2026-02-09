@@ -6,6 +6,19 @@ interface Props {
   onUpload: () => void;
 }
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.2, delayChildren: 0.1 }
+  }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { type: "spring" as const, stiffness: 50 } }
+};
+
 const Hero = ({ onCheckText, onUpload }: Props) => (
   <section className="relative py-20 md:py-32 overflow-hidden">
     {/* Geometric Background Shapes */}
@@ -16,29 +29,29 @@ const Hero = ({ onCheckText, onUpload }: Props) => (
       <div className="grid lg:grid-cols-2 gap-16 items-center">
         {/* Left Content */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
           className="text-center lg:text-left relative z-30"
         >
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white dark:bg-brand-cyan/10 border border-[hsl(207,90%,45%)]/30 dark:border-brand-cyan/20 text-[hsl(207,90%,45%)] dark:text-brand-cyan shadow-sm dark:shadow-none text-sm font-medium mb-6">
+          <motion.div variants={itemVariants} className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white dark:bg-brand-cyan/10 border border-[hsl(207,90%,45%)]/30 dark:border-brand-cyan/20 text-[hsl(207,90%,45%)] dark:text-brand-cyan shadow-sm dark:shadow-none text-sm font-medium mb-6">
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[hsl(207,90%,45%)] dark:bg-brand-cyan opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-[hsl(207,90%,45%)] dark:bg-brand-cyan"></span>
             </span>
             Powered by Gemini 3
-          </div>
+          </motion.div>
 
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-brand-navy leading-[1.1] tracking-tight mb-6">
+          <motion.h1 variants={itemVariants} className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-brand-navy leading-[1.1] tracking-tight mb-6">
             Verify info <br className="hidden md:block" />
             <span className="text-transparent bg-clip-text bg-gradient-brand">instantly.</span>
-          </h1>
+          </motion.h1>
 
-          <p className="mt-6 text-lg md:text-xl text-brand-muted max-w-2xl mx-auto lg:mx-0 leading-relaxed">
+          <motion.p variants={itemVariants} className="mt-6 text-lg md:text-xl text-brand-muted max-w-2xl mx-auto lg:mx-0 leading-relaxed">
             Stop misinformation in its tracks. VeriFact AI uses advanced LLMs and real-time Google Grounding to fact-check text and images in seconds.
-          </p>
+          </motion.p>
 
-          <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+          <motion.div variants={itemVariants} className="mt-10 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
             <button
               onClick={onCheckText}
               className="group inline-flex items-center justify-center gap-2 rounded-xl bg-brand-navy dark:bg-brand-cyan px-8 py-4 text-base font-bold text-white dark:text-white shadow-lg shadow-brand-navy/20 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 ring-offset-background focus:ring-brand-cyan"
@@ -53,7 +66,7 @@ const Hero = ({ onCheckText, onUpload }: Props) => (
               <Upload className="h-5 w-5" />
               Upload Image
             </button> */}
-          </div>
+          </motion.div>
         </motion.div>
 
         {/* Right — Interactive 3D-like Card */}

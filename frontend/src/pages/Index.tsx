@@ -9,6 +9,7 @@ import Footer from "@/components/Footer";
 import { useToast } from "@/hooks/use-toast";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import type { AnalysisResult } from "@/data/mockData";
+import { motion } from "framer-motion";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
@@ -177,12 +178,19 @@ const Index = () => {
       <Header />
       <Hero onCheckText={scrollToInput} onUpload={scrollToInput} />
 
-      <div ref={inputSectionRef} className="container mx-auto px-4 pb-8">
+      <motion.div
+        ref={inputSectionRef}
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        className="container mx-auto px-4 pb-8"
+      >
         <div className="max-w-4xl mx-auto">
           <TextInputPanel onAnalyze={handleAnalyze} isLoading={isLoading} inputRef={textRef} />
           {/* <ImageUploadPanel onUpload={handleAnalyzeImage} isLoading={isLoading} /> */}
         </div>
-      </div>
+      </motion.div>
 
       <ResultsPanel result={result} isLoading={isLoading} onShare={handleShare} />
       <HistoryPanel history={history} onClearHistory={clearHistory} onSelectHistory={handleSelectHistory} />

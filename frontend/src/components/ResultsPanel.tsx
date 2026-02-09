@@ -38,6 +38,22 @@ const SkeletonCard = ({ index }: { index: number }) => (
   </div>
 );
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.15,
+      delayChildren: 0.1
+    }
+  }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { type: "spring" as const, stiffness: 100 } }
+};
+
 const ResultsPanel = ({ result, isLoading, onShare }: Props) => {
   if (!isLoading && !result) return null;
 
@@ -45,8 +61,9 @@ const ResultsPanel = ({ result, isLoading, onShare }: Props) => {
     <section className="py-12" aria-live="polite" aria-label="Analysis results">
       <div className="container mx-auto px-4">
         <motion.h2
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
           className="text-2xl font-bold text-brand-navy mb-8"
         >
           Analysis Results
@@ -62,12 +79,21 @@ const ResultsPanel = ({ result, isLoading, onShare }: Props) => {
             </div>
           </div>
         ) : result ? (
-          <div className="space-y-8">
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            className="space-y-8"
+          >
             <div className="grid md:grid-cols-3 gap-6">
-              <CredibilityGauge score={result.score} verdict={result.summaryVerdict} />
+              <motion.div variants={itemVariants}>
+                <CredibilityGauge score={result.score} verdict={result.summaryVerdict} />
+              </motion.div>
               <div className="md:col-span-2 space-y-4">
                 {result.claims.map((claim, i) => (
-                  <ClaimCard key={claim.id} claim={claim} index={i} onShare={onShare} />
+                  <motion.div key={claim.id} variants={itemVariants} custom={i}>
+                    <ClaimCard claim={claim} index={i} onShare={onShare} />
+                  </motion.div>
                 ))}
               </div>
             </div>
@@ -75,9 +101,7 @@ const ResultsPanel = ({ result, isLoading, onShare }: Props) => {
             {/* Gemini 3 Search Queries Section */}
             {result.searchQueries && result.searchQueries.length > 0 && (
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 }}
+                variants={itemVariants}
                 className="mt-12 p-6 rounded-2xl bg-brand-navy/5 border border-brand-navy/10"
               >
                 <div className="flex items-center gap-2 mb-4">
@@ -99,7 +123,7 @@ const ResultsPanel = ({ result, isLoading, onShare }: Props) => {
                 </div>
               </motion.div>
             )}
-          </div>
+          </motion.div>
         ) : null}
       </div>
     </section>
