@@ -5,11 +5,12 @@ import type { AnalysisResult } from "@/data/mockData";
 interface Props {
   history: AnalysisResult[];
   onClearHistory: () => void;
+  onSelectHistory: (item: AnalysisResult) => void;
 }
 
 import { AnimatePresence, motion } from "framer-motion";
 
-const HistoryPanel = ({ history, onClearHistory }: Props) => {
+const HistoryPanel = ({ history, onClearHistory, onSelectHistory }: Props) => {
   const [open, setOpen] = useState(false);
 
   if (history.length === 0) return null;
@@ -33,25 +34,31 @@ const HistoryPanel = ({ history, onClearHistory }: Props) => {
               animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="mt-4 space-y-3 overflow-hidden"
+              className="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 overflow-hidden"
             >
               {history.map((h) => (
-                <div key={h.id} className="flex flex-col gap-3 rounded-lg border border-neutral-light/60 bg-card px-4 py-3 shadow-card sm:flex-row sm:items-center sm:justify-between">
-                  <div className="flex items-start gap-3 sm:items-center">
-                    <div className={`h-10 w-10 shrink-0 rounded-full flex items-center justify-center text-sm font-bold text-primary-foreground ${h.score >= 70 ? "bg-brand-cyan" : h.score >= 40 ? "bg-warning" : "bg-danger"
+                <div key={h.id} className="group flex flex-col justify-between rounded-2xl border border-neutral-light/60 bg-card p-5 shadow-sm hover:shadow-md hover:border-brand-cyan/30 transition-all duration-300">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className={`h-12 w-12 shrink-0 rounded-2xl flex items-center justify-center text-lg font-bold text-white shadow-sm ${h.score >= 70 ? "bg-brand-cyan" : h.score >= 40 ? "bg-warning" : "bg-danger"
                       }`}>
                       {h.score}
                     </div>
-                    <div>
-                      <p className="text-sm text-brand-navy font-medium break-words line-clamp-2 sm:line-clamp-1 sm:max-w-xs">{h.inputPreview}</p>
-                      <p className="text-xs text-brand-muted">{new Date(h.timestamp).toLocaleString()}</p>
-                    </div>
+                    <span className="text-xs text-brand-muted font-medium bg-neutral-100 dark:bg-white/5 px-2.5 py-1 rounded-md">
+                      {new Date(h.timestamp).toLocaleDateString()}
+                    </span>
                   </div>
+
+                  <div className="mb-6">
+                    <p className="text-sm text-brand-navy font-medium line-clamp-3 leading-relaxed">
+                      "{h.inputPreview}"
+                    </p>
+                  </div>
+
                   <button
-                    className="self-start sm:self-auto text-xs text-brand-muted hover:text-brand-cyan flex items-center gap-1 transition-colors focus:outline-none focus:ring-2 focus:ring-ring rounded px-2 py-1"
-                    aria-label="Export report"
+                    onClick={() => onSelectHistory(h)}
+                    className="w-full mt-auto flex items-center justify-center gap-2 text-sm font-semibold text-brand-cyan bg-brand-cyan/5 hover:bg-brand-cyan/10 border border-brand-cyan/20 py-2.5 rounded-xl transition-all active:scale-95"
                   >
-                    <Download className="h-3.5 w-3.5" /> PDF
+                    View Details
                   </button>
                 </div>
               ))}

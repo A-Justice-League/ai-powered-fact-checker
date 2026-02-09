@@ -76,6 +76,14 @@ const Index = () => {
     });
   };
 
+  const handleSelectHistory = (item: AnalysisResult) => {
+    setResult(item);
+    setTimeout(() => {
+      const resultsEl = document.querySelector('[aria-label="Analysis results"]');
+      resultsEl?.scrollIntoView({ behavior: "smooth" });
+    }, 100);
+  };
+
   const handleAnalyze = async (text: string) => {
     setIsLoading(true);
     setResult(null);
@@ -177,7 +185,7 @@ const Index = () => {
       </div>
 
       <ResultsPanel result={result} isLoading={isLoading} onShare={handleShare} />
-      <HistoryPanel history={history} onClearHistory={clearHistory} />
+      <HistoryPanel history={history} onClearHistory={clearHistory} onSelectHistory={handleSelectHistory} />
       <Footer />
     </div>
   );
