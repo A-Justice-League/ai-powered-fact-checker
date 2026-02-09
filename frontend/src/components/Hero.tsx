@@ -21,10 +21,10 @@ const Hero = ({ onCheckText, onUpload }: Props) => (
           transition={{ duration: 0.6, ease: "easeOut" }}
           className="text-center lg:text-left relative z-30"
         >
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-cyan/10 border border-brand-cyan/20 text-brand-cyan text-sm font-medium mb-6">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white dark:bg-brand-cyan/10 border border-[hsl(207,90%,45%)]/30 dark:border-brand-cyan/20 text-[hsl(207,90%,45%)] dark:text-brand-cyan shadow-sm dark:shadow-none text-sm font-medium mb-6">
             <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-cyan opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-brand-cyan"></span>
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[hsl(207,90%,45%)] dark:bg-brand-cyan opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-[hsl(207,90%,45%)] dark:bg-brand-cyan"></span>
             </span>
             Powered by Gemini 3
           </div>
@@ -41,18 +41,18 @@ const Hero = ({ onCheckText, onUpload }: Props) => (
           <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
             <button
               onClick={onCheckText}
-              className="group inline-flex items-center justify-center gap-2 rounded-xl bg-brand-navy dark:bg-brand-cyan px-8 py-4 text-base font-bold text-white dark:text-brand-navy shadow-lg shadow-brand-navy/20 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 ring-offset-background focus:ring-brand-cyan"
+              className="group inline-flex items-center justify-center gap-2 rounded-xl bg-brand-navy dark:bg-brand-cyan px-8 py-4 text-base font-bold text-white dark:text-white shadow-lg shadow-brand-navy/20 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 ring-offset-background focus:ring-brand-cyan"
             >
               Start Fact Check
               <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
             </button>
-            <button
+            {/* <button
               onClick={onUpload}
-              className="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-neutral-light/60 dark:border-white/10 bg-card px-8 py-4 text-base font-bold text-brand-navy hover:bg-neutral-light/20 hover:border-brand-muted transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 ring-offset-background focus:ring-neutral-light"
+              className="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-brand-navy/10 dark:border-white/10 bg-card px-8 py-4 text-base font-bold text-brand-navy hover:bg-neutral-light/20 hover:border-brand-muted transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 ring-offset-background focus:ring-neutral-light"
             >
               <Upload className="h-5 w-5" />
               Upload Image
-            </button>
+            </button> */}
           </div>
         </motion.div>
 

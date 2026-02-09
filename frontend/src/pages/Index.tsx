@@ -170,9 +170,9 @@ const Index = () => {
       <Hero onCheckText={scrollToInput} onUpload={scrollToInput} />
 
       <div ref={inputSectionRef} className="container mx-auto px-4 pb-8">
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="max-w-4xl mx-auto">
           <TextInputPanel onAnalyze={handleAnalyze} isLoading={isLoading} inputRef={textRef} />
-          <ImageUploadPanel onUpload={handleAnalyzeImage} isLoading={isLoading} />
+          {/* <ImageUploadPanel onUpload={handleAnalyzeImage} isLoading={isLoading} /> */}
         </div>
       </div>
 

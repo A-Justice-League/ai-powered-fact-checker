@@ -26,27 +26,35 @@ const HistoryPanel = ({ history, onClearHistory }: Props) => {
           {open ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
         </button>
 
-        {open && (
-          <div className="mt-4 space-y-3">
-            {history.map((h) => (
-              <div key={h.id} className="flex flex-col gap-3 rounded-lg border border-neutral-light/60 bg-card px-4 py-3 shadow-card sm:flex-row sm:items-center sm:justify-between">
-                <div className="flex items-start gap-3 sm:items-center">
-                  <div className={`h-10 w-10 rounded-full flex items-center justify-center text-sm font-bold text-primary-foreground ${h.score >= 70 ? "bg-brand-cyan" : h.score >= 40 ? "bg-warning" : "bg-danger"
-                    }`}>
-                    {h.score}
+        <AnimatePresence>
+          {open && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="mt-4 space-y-3 overflow-hidden"
+            >
+              {history.map((h) => (
+                <div key={h.id} className="flex flex-col gap-3 rounded-lg border border-neutral-light/60 bg-card px-4 py-3 shadow-card sm:flex-row sm:items-center sm:justify-between">
+                  <div className="flex items-start gap-3 sm:items-center">
+                    <div className={`h-10 w-10 shrink-0 rounded-full flex items-center justify-center text-sm font-bold text-primary-foreground ${h.score >= 70 ? "bg-brand-cyan" : h.score >= 40 ? "bg-warning" : "bg-danger"
+                      }`}>
+                      {h.score}
+                    </div>
+                    <div>
+                      <p className="text-sm text-brand-navy font-medium break-words line-clamp-2 sm:line-clamp-1 sm:max-w-xs">{h.inputPreview}</p>
+                      <p className="text-xs text-brand-muted">{new Date(h.timestamp).toLocaleString()}</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-sm text-brand-navy font-medium break-words line-clamp-2 sm:line-clamp-1 sm:max-w-xs">{h.inputPreview}</p>
-                    <p className="text-xs text-brand-muted">{new Date(h.timestamp).toLocaleString()}</p>
-                  </div>
+                  <button
+                    className="self-start sm:self-auto text-xs text-brand-muted hover:text-brand-cyan flex items-center gap-1 transition-colors focus:outline-none focus:ring-2 focus:ring-ring rounded px-2 py-1"
+                    aria-label="Export report"
+                  >
+                    <Download className="h-3.5 w-3.5" /> PDF
+                  </button>
                 </div>
-                <button
-                  className="self-start sm:self-auto text-xs text-brand-muted hover:text-brand-cyan flex items-center gap-1 transition-colors focus:outline-none focus:ring-2 focus:ring-ring rounded px-2 py-1"
-                  aria-label="Export report"
-                >
-                  <Download className="h-3.5 w-3.5" /> PDF
-                </button>
-              </div>
+              ))}
             </motion.div>
           )}
         </AnimatePresence>

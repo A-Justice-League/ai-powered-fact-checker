@@ -78,7 +78,7 @@ const TextInputPanel = ({ onAnalyze, isLoading, inputRef }: Props) => {
       <button
         onClick={handleSubmit}
         disabled={isLoading}
-        className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-brand px-6 py-4 text-base font-bold text-white shadow-brand hover:shadow-lg hover:shadow-brand-cyan/25 hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none focus:outline-none focus:ring-2 focus:ring-offset-2 ring-offset-background focus:ring-brand-cyan"
+        className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-brand border-2 border-brand-navy/10 dark:border-transparent px-6 py-4 text-base font-bold text-white shadow-brand hover:shadow-lg hover:shadow-brand-cyan/25 hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none focus:outline-none focus:ring-2 focus:ring-offset-2 ring-offset-background focus:ring-brand-cyan"
       >
         {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
         {isLoading ? "Consulting Gemini..." : "Analyze Authenticity"}
