@@ -28,7 +28,7 @@ class Settings(BaseSettings):
         "http://localhost:8000",
         "http://localhost:8080",
         "http://localhost",
-        "https://myverifactai.vercel.app/",
+        "https://myverifactai.vercel.app",
     ]
     
     class Config:
